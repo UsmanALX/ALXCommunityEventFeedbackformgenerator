@@ -1,5 +1,9 @@
 "use client";
 import { useState } from "react";
+import { Button } from "@/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card";
+import { Input } from "@/ui/input";
+import { Copy, ExternalLink } from "lucide-react";
 
 export default function Home() {
   const [eventName, setEventName] = useState("");
@@ -8,6 +12,11 @@ export default function Home() {
   const [generatedLink, setGeneratedLink] = useState("");
 
   const handleGenerate = () => {
+    if (!eventName.trim() || !eventDate.trim() || !eventType.trim()) {
+      alert("Please fill in all fields");
+      return;
+    }
+
     const formattedEventName = eventName.trim().replace(/\s+/g, "");
     const formattedDate = eventDate.trim().replace(/\s+/g, "");
     const formattedType = eventType.trim().replace(/\s+/g, "");
@@ -22,73 +31,130 @@ export default function Home() {
       alert("Link copied to clipboard!");
     } catch (err) {
       console.error("Failed to copy text: ", err);
+      // Fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = generatedLink;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      alert("Link copied to clipboard!");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-xl mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-8 text-gray-800 text-center">
-          Jotform Link Generator
-        </h1>
-        
-        <div className="space-y-4 mb-6">
-          <input
-            type="text"
-            placeholder="Event Name (e.g. CommunityMeetup)"
-            value={eventName}
-            onChange={(e) => setEventName(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
-          />
-          
-          <input
-            type="text"
-            placeholder="Event Date (e.g. April082025)"
-            value={eventDate}
-            onChange={(e) => setEventDate(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
-          />
-          
-          <input
-            type="text"
-            placeholder="Event Type (e.g. OnlineEvent)"
-            value={eventType}
-            onChange={(e) => setEventType(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
-          />
-          
-          <button
-            onClick={handleGenerate}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors font-medium"
-          >
-            Generate Link
-          </button>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            Jotform Link Generator
+          </h1>
+          <p className="text-lg text-gray-600">
+            Generate custom Jotform links for your events
+          </p>
         </div>
-        
-        {generatedLink && (
-          <div className="p-6 border border-gray-200 rounded-lg bg-white shadow-sm">
-            <p className="text-sm text-gray-600 mb-3 font-medium">Generated Link:</p>
-            <div className="flex items-start space-x-3">
-              <a
-                href={generatedLink}
-                className="text-blue-600 underline break-all flex-1 text-sm hover:text-blue-800"
-                target="_blank"
-                rel="noopener noreferrer"
+
+        <Card className="shadow-xl">
+          <CardHeader>
+            <CardTitle>Event Details</CardTitle>
+            <CardDescription>
+              Enter your event information to generate a custom Jotform link
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Event Name
+                </label>
+                <Input
+                  type="text"
+                  placeholder="e.g., CommunityMeetup"
+                  value={eventName}
+                  onChange={(e) => setEventName(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Event Date
+                </label>
+                <Input
+                  type="text"
+                  placeholder="e.g., April082025"
+                  value={eventDate}
+                  onChange={(e) => setEventDate(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Event Type
+                </label>
+                <Input
+                  type="text"
+                  placeholder="e.g., OnlineEvent"
+                  value={eventType}
+                  onChange={(e) => setEventType(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+
+              <Button
+                onClick={handleGenerate}
+                className="w-full"
+                size="lg"
               >
-                {generatedLink}
-              </a>
-              <button
-                onClick={handleCopy}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors flex-shrink-0"
-                title="Copy to clipboard"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-              </button>
+                Generate Link
+              </Button>
             </div>
-          </div>
-        )}
+
+            {generatedLink && (
+              <Card className="bg-green-50 border-green-200">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-medium text-green-800">
+                      Generated Link
+                    </h3>
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleCopy}
+                        className="text-green-700 border-green-300 hover:bg-green-100"
+                      >
+                        <Copy className="w-4 h-4 mr-1" />
+                        Copy
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        asChild
+                        className="text-green-700 border-green-300 hover:bg-green-100"
+                      >
+                        <a
+                          href={generatedLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <ExternalLink className="w-4 h-4 mr-1" />
+                          Open
+                        </a>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="bg-white p-3 rounded border border-green-200">
+                    <p className="text-sm text-gray-600 break-all">
+                      {generatedLink}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
